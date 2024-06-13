@@ -18,6 +18,7 @@ import com.comsign.showstockprice.data.StockRepo
 import com.comsign.showstockprice.network.GetStockDownloadStatus
 import com.comsign.showstockprice.viewmodel.StockViewModel
 import com.comsign.showstockprice.viewmodel.ViewModelFactory
+import kotlin.math.absoluteValue
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchStockButton: Button
     private lateinit var searchStockEdt: EditText
     private lateinit var stockValue: TextView
+    private lateinit var baseStockValueTv: TextView
     private lateinit var stockPercent: TextView
     private lateinit var refreshButton: Button
     private lateinit var stockNumEdt: EditText
@@ -78,10 +80,9 @@ class MainActivity : AppCompatActivity() {
         setUpSearchClickListener()
         setUpSearchStockEdt()
 
-
-
         stockPercent =
             stockInfoLayout.findViewById(R.id.stock_percent_change)
+        baseStockValueTv = stockInfoLayout.findViewById(R.id.stock_base_value)
         stockValue =
             stockInfoLayout.findViewById(R.id.stock_value)
         stockPercent =
@@ -116,6 +117,7 @@ class MainActivity : AppCompatActivity() {
                 val percentChange: String? = it.data?.get(2)
                 stockValue.text = "Last Rate ${lastRate}"
                 stockPercent.text = "Percent Change ${percentChange} %"
+                baseStockValueTv.text = "Base Rate : ${baseRate}"
                 if (lastRate != null) {
                     currentStockValue = lastRate.toDouble()
 
@@ -151,6 +153,7 @@ class MainActivity : AppCompatActivity() {
                 putString("stock_id", stockId)
                 apply()
             }
+            stockNumEdt.setText("")
             updateStockInfo()
         }
     }
@@ -167,8 +170,8 @@ class MainActivity : AppCompatActivity() {
                     numStockHolding = numStockValueStr.toInt()
                     val fullCash: Int = (numStockHolding * currentStockValue.toInt())
                     fullCashValue.text = "Current Net Work Of Stock: ${fullCash / 100}"
-                    val valueDiff: Double = currentStockValue - baseStockValue
-                    val profit: Int = (valueDiff * dailyPercentageChange).toInt() * numStockHolding
+                    val baseCashValue : Int =  (numStockHolding * baseStockValue.toInt())
+                    val profit: Int = fullCash - baseCashValue
                     dailyProfit.text = "Daily Profit: ${profit / 100}"
                     fullCashValue.visibility = View.VISIBLE
                     dailyProfit.visibility = View.VISIBLE
